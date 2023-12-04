@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  ddd_serve_nginx:
+    image: nginx:latest
+    container_name: ddd_serve_nginx
+    volumes:
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    ports:
+      - 2023:80
+  ddd_database:
+    image: postgres:latest
+    container_name: ddd_database
+    ports:
+      - 2024:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      TZ: UTC
+      POSTGRES_DB: ddd_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: JC5Ry3Sb
+  ddd_php-fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ddd_php-fpm
+    volumes:
+      - ./docker/php-fpm/php.ini:/usr/local/etc/php/php.ini
+      - ./back-end:/var/www/html
+      # - ./docker/cron/cron.root:/etc/cron.d/cron
+    working_dir: /var/www/html
+    stdin_open: true
+    tty: true
+  services_redis:
+    image: redis:latest
+    container_name: services_redis
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - 6379:6379
+volumes:
+  pgdata:
+    driver: local
