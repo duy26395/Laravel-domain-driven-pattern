@@ -17,6 +17,7 @@ class IndexAction extends Controller
     public function __invoke(): DataResource
     {
         $res = $this->interactor->handle();
+
         return new DataResource($res);
     }
 }
